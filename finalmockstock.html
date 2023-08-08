@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+                @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap');
+*
+{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Open Sans', sans-serif;
+}
+body
+{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+	background: #111;
+}
+.square
+{
+	position: relative;
+	width: 500px;
+	height: 500px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.square i
+{
+	position: absolute;
+	inset: 0;
+	border: 2px solid #fff;
+	transition: 0.5s;
+}
+.square i:nth-child(1)
+{
+	border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
+	animation: animate 6s linear infinite;
+}
+.square i:nth-child(2)
+{
+	border-radius: 41% 44% 56% 59%/38% 62% 63% 37%;
+	animation: animate 4s linear infinite;
+}
+.square i:nth-child(3)
+{
+	border-radius: 41% 44% 56% 59%/38% 62% 63% 37%;
+	animation: animate2 10s linear infinite;
+}
+.square:hover i
+{
+	border: 6px solid var(--clr);
+	filter: drop-shadow(0 0 20px var(--clr));
+}
+@keyframes animate
+{
+	0%
+	{
+		transform: rotate(0deg);
+	}
+	100%
+	{
+		transform: rotate(360deg);
+	}
+}
+@keyframes animate2
+{
+	0%
+	{
+		transform: rotate(360deg);
+	}
+	100%
+	{
+		transform: rotate(0deg);
+	}
+}
+.login 
+{
+	position: absolute;
+	width: 300px;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	gap: 20px;
+}
+.login h3 
+{
+	font-size: 2em;
+	color: #fff;
+}
+.login .inputBx 
+{
+	position: relative;
+	width: 100%;
+}
+.login .inputBx input 
+{
+	position: relative;
+	width: 100%;
+	padding: 12px 20px;
+	background: transparent;
+	border: 2px solid #fff;
+	border-radius: 40px;
+	font-size: 1.2em;
+	color: #fff;
+	box-shadow: none;
+	outline: none;
+}
+.login .inputBx input[type="button"]
+{
+	width: 100%;
+	background: #0078ff;
+	background: linear-gradient(45deg,#ff357a,#fff172);
+	border: none;
+	cursor: pointer;
+}
+.login .inputBx input::placeholder 
+{
+	color: rgba(255,255,255,0.75);
+}
+.login .links
+{
+	position: relative;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 20px;
+}
+.login .links a 
+{
+	color: #fff;
+	text-decoration: none;
+}
+    </style>
+</head>
+  <body>
+  <div id="app">
+    <div  v-if="! logged_in">        
+        <form>
+          <h3>
+            Mock Stock
+          </h3>
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label for="username">Name</label>
+              <input id="username" class="form-control" v-model="loginform.username">  
+            </div>
+            <div class="form-group col-6">
+              <label for="password">Password</label>
+              <input  type="password" class="form-control" id="password"  v-model="loginform.password">  
+            </div> 
+          </div> 
+          <button type="button" class="btn btn-primary" @click="login">Login</button>
+        </form>
+      </div>
+    </div>
+    <div class="row" v-if="logged_in" style="background-color: #cce5ff;">
+      <h1 class="display-1" style="font-size: 2.9em;">Mock Stock <span style="font-size: 0.9em; padding-left: 300px; font-weight: bold;" >{{participant}}</span></h1>
+    </div>
+    <div class="row"  v-if="logged_in" style="padding-bottom:15px;padding-top:15px">
+      <div class="col-3">
+        <h4>Holdings <span style="padding-left: 80px;">{{currentDate}}</span>  </h4>
+      </div>
+      <div class="col-2">
+        <span>Cash:</span> <span class="card-title" style="font-weight: bold; font-size: 1.2em;">{{pvalue[1].toFixed(2)}}</span>
+      </div>
+      <div class="col-2">
+        <span>Holdings:</span> <span class="card-title"  style="font-weight: bold; font-size: 1.2em;">{{pvalue[2].toFixed(2)}}</span>
+      </div>
+      <div class="col-2">
+        <span>Profit\Loss:</span> <span class="card-title"  style="font-weight: bold; font-size: 1.2em;">{{pvalue[3].toFixed(2)}}</span>
+      </div>
+    </div>
+    <div class="row" v-if="logged_in">
+      <div class="col-md-auto">
+        <div class="row">
+          <!-- <button type="button" class="btn btn-primary" @click="refresBtn">Start</button> -->
+          <table class="table  table-striped table-sm">
+            <thead class="thead-dark">
+              <th>Stock</th>
+              <th>Quantity</th>
+              <th>AvgPrice</th>
+              <th>Current Price</th>
+              <th>Value</th>
+              <th>ProfitLoss</th>
+              <th>Actions</th>
+            </thead>
+            <tbody>
+              <tr v-for="item in holdings">
+                <td>{{item[1]}}</td>
+                <td>{{item[2]}}</td>
+                <td>{{item[3].toFixed(2)}}</td>
+                <td>{{item[4]}}</td>
+                <td>{{item[5].toFixed(2)}}</td>
+                <td><span style="color:green;font-weight:bold;" v-if="item[6]>=0"> {{item[6].toFixed(2)}}</span><span style="color:red;font-weight:bold;" v-if="item[6]<0"> {{item[6].toFixed(2)}}</span></td>
+                <td><button type="button" class="btn btn-success btn-sm" @click="chart(item)" >Chart</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div id="curve_chart" style="width: 900px; height: 500px"></div>
+        <div style="font-weight:bold; padding-left: 30px;">
+          <span style="padding-left:100px;padding-right:8px;">High/Low:</span>           <span>{{currMax}}/{{currMin}}</span>  
+          <span style="padding-left:25px;padding-right:8px;">P/E Ratio:</span>            <span> {{stats[1]}}</span>
+          
+        </div>
+        <div style="font-weight:bold; padding-left: 30px;">
+          <span style="padding-left:100px;padding-right:8px;">Face Value:</span>           <span> {{stats[3]}}</span>
+          <span style="padding-left:25px;padding-right:8px;">Book value:</span>           <span> {{stats[2]}}</span>
+          <span style="padding-left:25px;padding-right:8px;">Div Yield:</span>                <span> {{stats[4]}}</span> 
+  
+          
+        </div>
+        <div style="font-weight:bold; padding-left: 30px;">
+          <span style="padding-left:100px;padding-right:8px;">annual growth:</span>               <span> {{stats[5]}}</span> 
+          <span style="padding-left:25px;padding-right:8px;">EPS:</span>                        <span> {{stats[6]}}</span> 
+          
+        </div>
+      </div>
+    </div>
+    <div class="row" v-if="is_admin">
+      <button type="button" class="btn btn-primary" @click="nexttick">Next Tick</button>
+    </div>
+    <div class="row" v-if="logged_in">
+      <div class="col-4" style="background-color: #cce5ff;">
+        <div role="alert">
+          <form>
+            <div class="form-row">
+              <div class="form-group col-3">
+                <label for="stock">Stock</label>
+                <select class="form-control form-control-sm"  v-model="orderform.stock">
+                  <option>TCS</option>
+                  <option>IOC</option>
+                  <option>RELIANCE</option>
+                  <option>ICICIBANK</option>
+                  <option>MARUTI</option>
+                  <option>ULTRACEMCO</option>
+                  <option>JSWSTEEL</option>
+                  <option>BHARTIARTL</option>
+                  <option>COALINDIA</option>
+                  <option>Muthoot Finance</option>
+                  <option>ADANIPORTS</option>
+                  <option>ASIANPAINT</option>
+                  <option>AXISBANK</option>
+                  <option>BAJAJ-AUTO</option>
+                  <option>DRREDDY</option>
+                   <option>Mahindra</option>
+                  <option>CIPLA</option>
+                  <option>GAIL</option>
+                  <option>HCLTECH</option>
+                  <option>HDFC</option>
+                  <option>HDFCBANK</option>
+                  <option>IDEA</option>
+                  <option>Ashok Leyland</option>
+                  <option>KOTAKBANK</option>
+                  <option>LT</option>
+                  <option>SBIN</option>
+                  <option>TATAMOTORS</option>
+                  <option>TATASTEEL</option>
+                  <option>TITAN</option>
+                  <option>INFY</option>
+                </select>
+              </div>
+              <div class="form-group col-3">
+                <label for="quantity">Quantity</label>
+                <input  id="quantity"  class="form-control form-control-sm" v-model="orderform.quantity">  
+              </div> 
+              <div class="form-group col-2">
+                <label for="buysell">Type</label>
+                <select class="form-control form-control-sm"  id="buysell" v-model="orderform.buysell">
+                  <option>BUY</option>
+                  <option>SELL</option>
+                </select>
+              </div>
+              <div class="col-4">
+                <button style="margin-top: 25px; margin-left: 25px;" type="button" class="btn btn-warning" @click="submitOrder" :disabled='isDisabled'>Order</button>
+              </div>
+            </div> 
+            
+          </form>
+          <h2>{{errormsg}}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const { createApp } = Vue
+    createApp({
+      mounted(){
+        console.log("In mounted 1111")
+        google.charts.load('current', {'packages':['corechart']});
+        //google.charts.setOnLoadCallback(drawChart);
+      },
+      beforeDestroy () {
+        clearInterval(this.intervalid1)
+      },
+      methods: {
+          nexttick(){
+            google.script.run.withSuccessHandler(function(data) 
+            {
+              console.log(data)
+            }).nextTick();   
+          },
+          chart(citem){
+            console.log("In Chart");
+            console.log(citem[1]);
+            var tdata=this
+            var symbol = citem[1]
+            google.script.run.withSuccessHandler(function(data) 
+            {
+              tdata.chartdata = data
+              console.log(data)
+              var gdata = google.visualization.arrayToDataTable(data.prices);
+              tdata.currMax = data.currMax;
+              tdata.currMin = data.currMin;
+              var options = {
+                title: 'Company Performance ' + symbol,
+                curveType: 'function'
+              };
+              var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+              chart.draw(gdata, options);
+            }).getPrices(symbol,50);   
+            google.script.run.withSuccessHandler(function(data) 
+            {
+              tdata.stats = data
+            }).getStats(symbol);   
+          },
+          login(){
+            console.log("In Login")
+            var tdata=this
+            google.script.run.withSuccessHandler(function(data) 
+            {
+              console.log(data)
+              if(tdata.loginform.password == data[0]  )
+              {
+                tdata.participant = data[1]
+                if ( tdata.participant == "Darsh")
+                {
+                  tdata.is_admin=true
+                }
+                tdata.logged_in = true
+                tdata.increment()
+                tdata.refresBtn()
+                console.log("Login Successfull")
+              }
+              else{
+                console.log("Login Not Successfull")
+              }
+              
+              
+            }).getPassword(this.loginform.username);  
+            var child = document.getElementById("warning-bar-table"); 
+            console.log(child)
+            console.log(child.parentNode)
+            // Remove the child element from the document
+            child.parentNode.removeChild(child);
+          },
+          submitOrder() {
+            console.log("In submitOrder")
+            this.errormsg = ""
+            console.log(this.orderform)
+            var tdata=this
+            this.isDisabled=true;
+            google.script.run.withSuccessHandler(function(data) 
+            {
+              console.log(data)
+              tdata.isDisabled=false;
+              tdata.errormsg = data;
+              tdata.increment();
+            }).processOrder(this.participant, this.orderform.stock,Number(this.orderform.quantity),this.orderform.buysell );     
+            
+          },
+          refresBtn(){
+            if( this.intervalid1 )
+            {
+              return
+            }
+            var tdata=this
+            console.log("In starting interval")
+            this.intervalid1 = setInterval(function(){
+                tdata.increment();
+            }, 10000);
+          },
+          increment() {
+            console.log("I am here")
+            this.count++
+            var tdata=this
+            google.script.run.withSuccessHandler(function(data) 
+            {
+              tdata.holdings = data
+            }).getHoldings(this.participant );     
+            google.script.run.withSuccessHandler(function(data) 
+            {
+              tdata.pvalue = data
+              console.log(data)
+            }).getValue(this.participant );    
+            google.script.run.withSuccessHandler(function(data) 
+            {
+              console.log("Getting date")
+              console.log(data)
+              tdata.currentDate = data
+              console.log(data)
+            }).getCurrentDate();    
+
+          }
+        },
+      data() {
+        return {
+          message: 'Hello Vue!',
+          logged_in: false,
+          intervalid1:'',
+          isDisabled:false,
+          is_admin: false,
+          currMin: '',
+          currMax: '',
+          stats: {},
+          participant: "",
+          currentDate: "",
+          errormsg:"",
+          stocks:[],
+          holdings:[],
+          chartdata:[],
+          pvalue:[],
+          orderform: { quantity: 1, stock: "",buysell:"BUY"  },
+          loginform: { username: "", password: ""  },
+          count: 0
+        }
+      }
+    }).mount('#app')
+  </script>
+  </body>
+</html>

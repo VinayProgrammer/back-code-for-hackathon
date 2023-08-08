@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .body {
+            background-color: transparent;
+        }
+
+        .conatiner {
+            display: flex;
+            right: 12px;
+            left: 12px;
+            border: 1px black;
+        }
+        #chatbot {
+            display: flex;
+            position: fixed;
+            bottom: 20px;
+           /* padding-left: 20px; */
+           /* margin-left: 2px; */
+            /* right: 20px;
+            left: 20px; */
+            width: 100%;
+            max-width: 3000px;
+            height: 100%;
+            max-height: 4000px;
+            border: 12px;
+            border-radius: 12px;
+            background-color: transparent;
+            z-index: 9990;
+            
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <iframe src="https://www.yoya.ai/chat/cad12c0b-99c5-4eac-8b36-838b4be33e3e" id="chatbot"
+        width="100%"
+    height="800px"
+    style="
+      border: 1px solid rgba(145, 158, 171, 0.24);
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(150, 150, 150, 0.2) 0px 0px 0px 1px;
+      border-radius: 10px;
+    "
+    >
+    </div>
+
+    <script async src="https://www.yoya.ai/sdk.js" id="cad12c0b-99c5-4eac-8b36-838b4be33e3e" icColor="#7635dc"></script>
+</body>
+
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+            background-color: #000;
+            color: #fff;
+        }
+
+        h1 {
+            display: flex;
+            align-items: center;
+            align-content: center;
+            justify-content: center;
+        }
+
+        .main_box,
+        .img,
+        .mouse {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .main_box {
+            cursor: none;
+        }
+
+        .img,
+        .mouse {
+            background-image: url('https://i.ibb.co/pbTf2nf/Holmes-Hunt-Website-Treasure-hunt-5.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .img {
+            filter: brightness(0.0%);
+        }
+        .mouse {
+            /* Set the initial clip-path to a large circle that covers the element */
+            clip-path: circle(9999px at 0 0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main_box">
+        <div class="img"></div>
+        <div class="mouse"></div>
+    </div>
+
+    <script>
+        let main = document.querySelector('.main_box');
+        let mouse = document.querySelector('.mouse');
+        const circleRadius = 46; // Radius of the circle in pixels
+
+        // Function to update the circle position based on the event coordinates
+        function updateCirclePosition(x, y) {
+            // Calculate the relative coordinates based on the center of the main_box element
+            const mainRect = main.getBoundingClientRect();
+            const centerX = x - mainRect.left;
+            const centerY = y - mainRect.top;
+
+            // Adjust the circle's position based on the cursor/touch position and the circle radius
+            const clipPathValue = `circle(${circleRadius}px at ${centerX}px ${centerY}px)`;
+            mouse.style.clipPath = clipPathValue;
+        }
+
+        // Function to handle both mousemove and touchmove events
+        function handleMoveEvent(e) {
+            if (e instanceof MouseEvent) {
+                updateCirclePosition(e.clientX, e.clientY);
+            } else if (e instanceof TouchEvent) {
+                if (e.touches.length === 1) {
+                    const touch = e.touches[0];
+                    updateCirclePosition(touch.clientX, touch.clientY);
+                }
+            }
+        }
+
+        // Event listener for mousemove and touchmove events
+        main.addEventListener('mousemove', handleMoveEvent);
+        main.addEventListener('touchmove', handleMoveEvent);
+    </script>
+</body>
+</html>

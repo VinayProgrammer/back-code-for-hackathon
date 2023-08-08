@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        /* Your CSS styles here */
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="scrollable-content">
+            <div class="main_box">
+                <div class="img">
+                    <img src="https://i.ibb.co/KNGtJ45/5ee6bda6-e922-4dd7-9a18-0d8dc0fb0ad6.jpg"
+                        alt="Treasure Map Image" usemap="#treasure-map">
+                    <!-- Use the 'usemap' attribute to reference the map -->
+                    <map name="treasure-map">
+                        <area shape="rect" coords="1132,1004,1320,1249" id="treasure-area"
+                            href="https://huggingface.co/spaces/stabilityai/stable-diffusion" alt="Key">
+                        <!-- Specify shape='rect' for a rectangular area -->
+                        <!-- Adjusted the 'coords' to define a rectangle -->
+                    </map>
+                </div>
+                <div class="mouse"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let areaElement = document.getElementById('treasure-area');
+
+        areaElement.addEventListener('click', function(event) {
+            // Prevent the default behavior (navigation) of the link
+            event.preventDefault();
+
+            // Get the URL from the href attribute
+            let url = areaElement.getAttribute('href');
+
+            // Redirect the user to the specified URL
+            window.location.href = url;
+        });
+    </script>
+</body>
+
+</html>
